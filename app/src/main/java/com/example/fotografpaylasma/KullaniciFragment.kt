@@ -24,6 +24,14 @@ class KullaniciFragment : Fragment() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val action = KullaniciFragmentDirections.actionKullaniciFragmentToFeedFragment()
+            Navigation.findNavController(requireView()).navigate(action)
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
         _binding = FragmentKullaniciBinding.inflate(inflater, container, false)
@@ -38,8 +46,18 @@ class KullaniciFragment : Fragment() {
     }
 
     fun girisYap(view: View) {
-        val action = KullaniciFragmentDirections.actionKullaniciFragmentToFeedFragment()
-        Navigation.findNavController(view).navigate(action)
+
+        val email = binding.emailText.text.toString()
+        val password = binding.sifreText.text.toString()
+
+        if (email.isNotEmpty() && password.isNotEmpty()) {
+            auth.signInWithEmailAndPassword(email, password).addOnSuccessListener {
+                val action = KullaniciFragmentDirections.actionKullaniciFragmentToFeedFragment()
+                Navigation.findNavController(view).navigate(action)
+            }.addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), exception.localizedMessage, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun kayitOl(view: View) {
@@ -54,7 +72,7 @@ class KullaniciFragment : Fragment() {
                     Navigation.findNavController(view).navigate(action)
                 }
             }.addOnFailureListener { exception ->
-                Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), exception.localizedMessage, Toast.LENGTH_LONG).show()
             }
         }
 

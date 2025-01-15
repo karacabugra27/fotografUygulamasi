@@ -10,16 +10,20 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.navigation.Navigation
 import com.example.fotografpaylasma.databinding.FragmentFeedBinding
 import com.example.fotografpaylasma.databinding.FragmentKullaniciBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class FeedFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
     private lateinit var popup: PopupMenu
+    private lateinit var auth : FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
+        auth = Firebase.auth
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -52,6 +56,7 @@ class FeedFragment : Fragment(), PopupMenu.OnMenuItemClickListener {
             val action = FeedFragmentDirections.actionFeedFragmentToYuklemeFragment()
             Navigation.findNavController(requireView()).navigate(action)
         } else if (item?.itemId == R.id.cikisItem) {
+            auth.signOut()
             val action = FeedFragmentDirections.actionFeedFragmentToKullaniciFragment()
             Navigation.findNavController(requireView()).navigate(action)
         }
