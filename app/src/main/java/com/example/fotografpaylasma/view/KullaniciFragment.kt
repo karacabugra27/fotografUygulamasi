@@ -1,4 +1,4 @@
-package com.example.fotografpaylasma
+package com.example.fotografpaylasma.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

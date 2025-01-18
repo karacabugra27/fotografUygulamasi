@@ -1,4 +1,4 @@
-package com.example.fotografpaylasma
+package com.example.fotografpaylasma.view
 
 import android.Manifest
 import android.app.Activity.RESULT_OK
@@ -16,13 +16,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.navigation.Navigation
 import com.example.fotografpaylasma.databinding.FragmentYuklemeBinding
-import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 class YuklemeFragment : Fragment() {
 
@@ -32,12 +37,18 @@ class YuklemeFragment : Fragment() {
     private lateinit var permissionLauncher : ActivityResultLauncher<String>
     var secilenGorsel : Uri? = null
     var secilenBitmap : Bitmap? = null
+    private lateinit var db : FirebaseFirestore
+    private lateinit var auth : FirebaseAuth
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
+        db = Firebase.firestore
         registersLaunchers()
+
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -54,7 +65,19 @@ class YuklemeFragment : Fragment() {
     }
 
     fun yukleTiklandi(view : View){
+        if (auth.currentUser != null) {
+            val hash = hashMapOf<String,Any>()
+            hash.put("email", auth.currentUser!!.email.toString())
+            hash.put("comment", binding.commentText.text.toString())
+            hash.put("date", Timestamp.now())
 
+            db.collection("Posts").add(hash).addOnSuccessListener { documentReference ->
+                val action = YuklemeFragmentDirections.actionYuklemeFragmentToFeedFragment()
+                Navigation.findNavController(view).navigate(action)
+            }.addOnFailureListener { exception ->
+                Toast.makeText(requireContext(),exception.localizedMessage,Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun gorselSec(view : View){
